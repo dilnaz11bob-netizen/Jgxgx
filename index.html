@@ -60,6 +60,7 @@
       box-shadow: 0 6px 14px rgba(22, 46, 88, 0.18);
     }
 
+    /* Растягиваем видео и фреймы под размер прямоугольника */
     .video-card video,
     .video-card iframe {
       width: 100%;
@@ -67,6 +68,9 @@
       object-fit: cover;
       border: none;
       display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
     }
 
     /* Тонкая линия-разделитель */
@@ -486,7 +490,6 @@
       { id: "cat9", title: "Категория 9", keywords: ["категория 9"], image: "", items: [] }
     ];
 
-    // Начальные данные из твоей таблицы (до подгрузки свежих)
     const initialSheetProducts = [
       {
         category: "Авторские шарфы с сережкой",
@@ -531,12 +534,10 @@
         card.className = "video-card";
 
         if (rawUrl) {
-          // Если ссылка с Google Drive — открываем через встроенный плеер preview
           const driveMatch = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
           if (driveMatch && driveMatch[1]) {
             card.innerHTML = `<iframe src="https://drive.google.com/file/d/${driveMatch[1]}/preview" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
           } else {
-            // Если прямая ссылка на .mp4
             card.innerHTML = `<video src="${rawUrl}" autoplay muted loop playsinline controls></video>`;
           }
         }
@@ -559,7 +560,6 @@
       });
     }
 
-    // Единая загрузка товаров (A–F) и видео (J) из Google Таблицы
     async function loadDataFromSheet() {
       distributeProducts(initialSheetProducts);
       renderMainCatalog();
@@ -578,12 +578,10 @@
           for (let i = 1; i < rows.length; i++) {
             const row = rows[i];
 
-            // Столбец J (индекс 9) — Видео
             if (row[9] && loadedVideos.length < 3) {
               loadedVideos.push(row[9]);
             }
 
-            // Столбцы A–F — Товары
             if (row[0] || row[2]) {
               const rawPrice = row[3] || "";
               const formattedPrice = rawPrice && !rawPrice.includes("₸") ? `${rawPrice} ₸` : rawPrice;
